@@ -37,7 +37,7 @@ let s:dirName = fnamemodify(s:scriptName, ":h")
 command! -nargs=0 VicmakeRerunCmake :call <SID>VicmakeRerunCmake()
 command! -nargs=1 VicmakeRunCmake :call <SID>VicmakeRunCmake("<args>")
 command! -nargs=0 VicmakeStartEdit :call <SID>VicmakeStartEdit()
-
+command! -nargs=0 VicmakeReloadCache :call <SID>VicmakeReloadCache()
 
 "
 " set keymaps
@@ -89,6 +89,7 @@ def func():
     if not cmake.RerunCmake():
         vim.command(":echo \"ERROR: the number of variable name, type and value are not match.\"")
         return
+    vim.command(":call s:VicmakeReloadCache()")
 
 # run
 func()
@@ -138,7 +139,7 @@ def func():
     valFile = cmake.GetValCacheFilename()
     typeFile = cmake.GetTypeCacheFilename()
     nameFile = cmake.GetNameCacheFilename()
-    cmake.InitEdit()
+    cmake.LoadCache()
     vim.command(":e " + valFile)
     vim.command(":call s:SetKeymap()")
     vim.command(":set scb")
@@ -151,6 +152,31 @@ def func():
     vim.command(":call s:SetKeymap()")
     vim.command(":set scb")
     vim.command(":set cursorbind")
+    #vim.current.buffer.append(
+
+# run
+func()
+
+EOF
+endfunction
+
+"
+" reload cache
+"
+function! s:VicmakeReloadCache()
+python << EOF
+# add script directory to search path
+import vim, sys
+sys.path.append(vim.eval("s:dirName"))
+import vicmake
+
+def func():
+    cmake = vicmake.GetInstance()
+    if cmake == None:
+        vim.command(":echo \"ERROR: cache file could not found. run cmake at first\"")
+        return
+    cmake.LoadCache()
+    vim.command(":windo e")
     #vim.current.buffer.append(
 
 # run

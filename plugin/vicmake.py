@@ -57,9 +57,8 @@ class Vicmake():
         self.ParseFile()
         self.InitEdit()
 
-    def InitEdit(self):
-        if self.mInitDone == False:
-            self.ParseFile()
+    def LoadCache(self):
+        self.ParseFile()
         try:
             fval = open(self.GetValCacheFilename(), "w")
             fname = open(self.GetNameCacheFilename(), "w")
@@ -108,7 +107,7 @@ class Vicmake():
         return True
 
     def RerunCmake(self):
-        if self.WritebackCache():
+        if not self.WritebackCache():
             return False
 
         cmd = "cmake " + self.mSrcDir
