@@ -19,3 +19,10 @@ The middle pane is _variable name_ pane which lists the name of variables. The r
 value of the variables.
 
 3. Edit _value pane_ and save the _value pane_ and rerun cmake.
+
+Note
+----
+vicmake.vim redraws the window everytime you change the line.
+If you don't like this behavior set g:VicmakeRedraw to 0 like below.
+
+        let g:VicmakeRedraw = 0
