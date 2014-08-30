@@ -37,9 +37,6 @@ endif
 
 let s:scriptName = expand('<sfile>:p')
 let s:dirName = fnamemodify(s:scriptName, ":h") 
-let s:winnrVal = ""
-let s:winnrType = ""
-let s:winnrName = ""
 
 "
 " define commands
@@ -52,7 +49,7 @@ command! -nargs=0 VicmakeReloadCache :call <SID>VicmakeReloadCache()
 "
 " set keymaps
 "
-function! s:SetKeymap()
+function! s:SetupBuff()
     autocmd BufWritePost <buffer> call <SID>VicmakeWriteback()
     autocmd CursorMoved <buffer> call <SID>UpdateCursor()
     hi CursorLine term=reverse cterm=reverse gui=reverse
@@ -68,7 +65,6 @@ function! s:UpdateCursor()
         return
     endif
     let s:prevLine = l:curLine
-"    echo "winnr: " . s:winnrVal . "," . s:winnrName . "," . s:winnrType
 "    let l:origNr = winnr()
 "    for l:i in range(1, winnr("$"))
 "        exe l:i . "wincmd w"
@@ -172,23 +168,20 @@ def func():
     nameFile = cmake.GetNameCacheFilename()
     cmake.LoadCache()
     vim.command(":e " + valFile)
-    vim.command(":call s:SetKeymap()")
+    vim.command(":call s:SetupBuff()")
     vim.command(":set scb")
     vim.command(":set cursorbind")
-    vim.command(":let s:winnrVal = winnr()")
 
     vim.command(":vnew " + nameFile)
-    vim.command(":call s:SetKeymap()")
+    vim.command(":call s:SetupBuff()")
     vim.command(":set scb")
     vim.command(":set cursorbind")
-    vim.command(":let s:winnrName = winnr()")
 
     if int(vim.eval("g:VicmakeShowType")) != 0:
         vim.command(":vnew " + typeFile)
-        vim.command(":call s:SetKeymap()")
+        vim.command(":call s:SetupBuff()")
         vim.command(":set scb")
         vim.command(":set cursorbind")
-        vim.command(":let s:winnrType = winnr()")
 # run
 func()
 
