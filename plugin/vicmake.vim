@@ -28,8 +28,18 @@ if !has('python')
     finish
 endif
 
+if !exists("g:VicmakeRedraw")
+    let g:VicmakeRedraw = 1
+endif
+if !exists("g:VicmakeShowType")
+    let g:VicmakeShowType = 0
+endif
+
 let s:scriptName = expand('<sfile>:p')
 let s:dirName = fnamemodify(s:scriptName, ":h") 
+let s:winnrVal = ""
+let s:winnrType = ""
+let s:winnrName = ""
 
 "
 " define commands
@@ -44,6 +54,27 @@ command! -nargs=0 VicmakeReloadCache :call <SID>VicmakeReloadCache()
 "
 function! s:SetKeymap()
     autocmd BufWritePost <buffer> call <SID>VicmakeWriteback()
+    autocmd CursorMoved <buffer> call <SID>UpdateCursor()
+    hi CursorLine term=reverse cterm=reverse gui=reverse
+endfunction
+
+let s:prevLine = -1
+function! s:UpdateCursor()
+    if g:VicmakeRedraw == 0
+        return
+    endif
+    let l:curLine = line(".")
+    if s:prevLine == l:curLine
+        return
+    endif
+    let s:prevLine = l:curLine
+"    echo "winnr: " . s:winnrVal . "," . s:winnrName . "," . s:winnrType
+"    let l:origNr = winnr()
+"    for l:i in range(1, winnr("$"))
+"        exe l:i . "wincmd w"
+"    endfor
+"    exe l:origNr . "wincmd w"
+    redraw!
 endfunction
 
 "
@@ -144,16 +175,20 @@ def func():
     vim.command(":call s:SetKeymap()")
     vim.command(":set scb")
     vim.command(":set cursorbind")
+    vim.command(":let s:winnrVal = winnr()")
+
     vim.command(":vnew " + nameFile)
     vim.command(":call s:SetKeymap()")
     vim.command(":set scb")
     vim.command(":set cursorbind")
-    vim.command(":vnew " + typeFile)
-    vim.command(":call s:SetKeymap()")
-    vim.command(":set scb")
-    vim.command(":set cursorbind")
-    #vim.current.buffer.append(
+    vim.command(":let s:winnrName = winnr()")
 
+    if int(vim.eval("g:VicmakeShowType")) != 0:
+        vim.command(":vnew " + typeFile)
+        vim.command(":call s:SetKeymap()")
+        vim.command(":set scb")
+        vim.command(":set cursorbind")
+        vim.command(":let s:winnrType = winnr()")
 # run
 func()
 
