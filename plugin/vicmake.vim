@@ -32,7 +32,7 @@ if !exists("g:VicmakeRedraw")
     let g:VicmakeRedraw = 1
 endif
 if !exists("g:VicmakeShowType")
-    let g:VicmakeShowType = 0
+    let g:VicmakeShowType = 1
 endif
 
 let s:scriptName = expand('<sfile>:p')
@@ -178,10 +178,11 @@ def func():
     vim.command(":set cursorbind")
 
     if int(vim.eval("g:VicmakeShowType")) != 0:
-        vim.command(":vnew " + typeFile)
+        vim.command(":20vnew " + typeFile)
         vim.command(":call s:SetupBuff()")
         vim.command(":set scb")
         vim.command(":set cursorbind")
+    vim.command(":exe bufwinnr('" + valFile + "') . 'wincmd w'")
 # run
 func()
 
