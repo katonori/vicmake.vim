@@ -37,14 +37,18 @@ endif
 
 let s:scriptName = expand('<sfile>:p')
 let s:dirName = fnamemodify(s:scriptName, ":h") 
+let s:valFile = ""
+let s:typeFile = ""
+let s:nameFile = ""
 
 "
 " define commands
 "
-command! -nargs=0 VicmakeRerunCmake :call <SID>VicmakeRerunCmake()
-command! -nargs=1 VicmakeRunCmake :call <SID>VicmakeRunCmake("<args>")
+"command! -nargs=0 VicmakeRerunCmake :call <SID>VicmakeRerunCmake()
+"command! -nargs=1 VicmakeRunCmake :call <SID>VicmakeRunCmake("<args>")
+"command! -nargs=0 VicmakeReloadCache :call <SID>VicmakeReloadCache()
 command! -nargs=0 VicmakeStartEdit :call <SID>VicmakeStartEdit()
-command! -nargs=0 VicmakeReloadCache :call <SID>VicmakeReloadCache()
+command! -nargs=0 VicmakeQuit :call <SID>CloseAll()
 
 "
 " set keymaps
@@ -52,7 +56,8 @@ command! -nargs=0 VicmakeReloadCache :call <SID>VicmakeReloadCache()
 function! s:SetupBuff()
     autocmd BufWritePost <buffer> call <SID>VicmakeWriteback()
     autocmd CursorMoved <buffer> call <SID>UpdateCursor()
-    hi CursorLine term=reverse cterm=reverse gui=reverse
+    setlocal cursorline
+    "hi CursorLine term=reverse cterm=reverse gui=reverse
 endfunction
 
 let s:prevLine = -1
@@ -65,11 +70,6 @@ function! s:UpdateCursor()
         return
     endif
     let s:prevLine = l:curLine
-"    let l:origNr = winnr()
-"    for l:i in range(1, winnr("$"))
-"        exe l:i . "wincmd w"
-"    endfor
-"    exe l:origNr . "wincmd w"
     redraw!
 endfunction
 
@@ -166,6 +166,10 @@ def func():
     valFile = cmake.GetValCacheFilename()
     typeFile = cmake.GetTypeCacheFilename()
     nameFile = cmake.GetNameCacheFilename()
+    vim.command(":let s:valFile = '" + valFile + "'")
+    vim.command(":let s:nameFile = '" + nameFile + "'")
+    vim.command(":let s:typeFile = '" + typeFile + "'")
+
     cmake.LoadCache()
     vim.command(":e " + valFile)
     vim.command(":call s:SetupBuff()")
@@ -212,4 +216,28 @@ def func():
 func()
 
 EOF
+endfunction
+
+function! s:CloseAll()
+    if s:valFile != ""
+        let l:nr = bufwinnr(s:valFile)
+        if l:nr != -1
+            exe l:nr . 'wincmd w'
+            :quit
+        endif
+    endif
+    if s:nameFile != ""
+        let l:nr = bufwinnr(s:nameFile)
+        if l:nr != -1
+            exe l:nr . 'wincmd w'
+            :quit
+        endif
+    endif
+    if s:typeFile != ""
+        let l:nr = bufwinnr(s:typeFile)
+        if l:nr != -1
+            exe l:nr . 'wincmd w'
+            :quit
+        endif
+    endif
 endfunction
