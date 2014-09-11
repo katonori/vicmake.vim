@@ -8,6 +8,7 @@ CMAKE_CACHE = "CMakeCache.txt"
 
 class Vicmake():
     mVarList = []
+    mStaticVarList = []
     mInternalVarList = []
     mLogFilename = ""
     mNameCacheFilename = ""
@@ -41,7 +42,10 @@ class Vicmake():
                 if isStartInternal:
                     self.mInternalVarList.append((name, type, val))
                 else:
-                    self.mVarList.append((name, type, val))
+                    if type == "STATIC":
+                        self.mStaticVarList.append((name, type, val))
+                    else:
+                        self.mVarList.append((name, type, val))
             m = re.search(r"^# INTERNAL cache entries", l)
             if m:
                 isStartInternal = True
@@ -49,6 +53,8 @@ class Vicmake():
 
     def Dump(self):
         for v in self.mVarList:
+            print "%s:%s\t\t%s"%(v[1], v[0], v[2])
+        for v in self.mStaticVarList:
             print "%s:%s\t\t%s"%(v[1], v[0], v[2])
 
     def RunCmake(self, dir):
@@ -67,6 +73,10 @@ class Vicmake():
             raise e
 
         for l in self.mVarList:
+            fname.write("%s\n"%(l[0]))
+            ftype.write("%s\n"%(l[1]))
+            fval.write("%s\n"%(l[2]))
+        for l in self.mStaticVarList:
             fname.write("%s\n"%(l[0]))
             ftype.write("%s\n"%(l[1]))
             fval.write("%s\n"%(l[2]))
