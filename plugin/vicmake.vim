@@ -56,6 +56,7 @@ command! -nargs=0 VicmakeQuit :call <SID>CloseAll()
 function! s:SetupBuff()
     autocmd BufWritePost <buffer> call <SID>VicmakeWriteback()
     autocmd CursorMoved <buffer> call <SID>UpdateCursor()
+    nnoremap <leader>q :VicmakeQuit<cr>
     setlocal cursorline
     "hi CursorLine term=reverse cterm=reverse gui=reverse
 endfunction
